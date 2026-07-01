@@ -106,7 +106,8 @@ function initPolyPhysics() {
     points = []; sticks = [];
     function addP(x, y) { let p = { x: x, y: y, oldX: x, oldY: y }; points.push(p); return p; }
     function addS(p1, p2, l) { let s = { p1: p1, p2: p2, len: l }; sticks.push(s); return s; }
-    let h = addP(300, 200), c = addP(300, 220), pv = addP(300, 240), lh = addP(292, 242), lk = addP(290, 265), lf = addP(290, 290), rh = addP(308, 242), rk = addP(310, 265), rf = addP(310, 290), ls = addP(288, 218), lhn = addP(270, 230), rs = addP(312, 218), rhn = addP(330, 230);    addS(h, c, 20); addS(c, pv, 20); addS(c, ls, 12); addS(ls, lhn, 22); addS(c, rs, 12); addS(rs, rhn, 22); addS(pv, lh, 8); addS(lh, lk, 22); addS(lk, lf, 22); addS(pv, rh, 8); addS(rh, rk, 22); addS(rk, rf, 22);
+    let h = addP(300, 200), c = addP(300, 220), pv = addP(300, 240), lh = addP(292, 242), lk = addP(290, 265), lf = addP(290, 290), rh = addP(308, 242), rk = addP(310, 265), rf = addP(310, 290), ls = addP(288, 218), lhn = addP(270, 230), rs = addP(312, 218), rhn = addP(330, 230);
+    addS(h, c, 20); addS(c, pv, 20); addS(c, ls, 12); addS(ls, lhn, 22); addS(c, rs, 12); addS(rs, rhn, 22); addS(pv, lh, 8); addS(lh, lk, 22); addS(lk, lf, 22); addS(pv, rh, 8); addS(rh, rk, 22); addS(rk, rf, 22);
     window.pH = h; window.pPV = pv; window.pLF = lf; window.pRF = rf; window.pC = c; window.pLS = ls; window.pLH = lhn; window.pRS = rs; window.pRH = rhn;
 }
 

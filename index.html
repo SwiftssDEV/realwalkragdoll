@@ -1,15 +1,80 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Полигон Свифтса</title>
-<link rel="stylesheet" href="styles.css"></head><body>
-<div id="box">
-  <h2>🎮 УЛЬТИМАТИВНЫЙ ПОЛИГОН 2026</h2>
-  <a id="drag-btn" href="#">🚀 КИБЕР-ОТРЯД: СТИКМЕН И СУ-57</a>
-  <button id="go-poly">🤸‍♂️ ОТКРЫТЬ ФИЗИЧЕСКИЙ ПОЛИГОН</button>
-</div>
-<div id="poly-screen" style="display:none;"><div id="sidebar"><button id="btn-vac">🧹 ПЫЛЕСОС</button><button id="btn-gun">🔫 ПУШКИ</button><div id="chat-box"><div id="chat-log"></div></div><button id="exit-poly">⬅️ Выход</button></div><canvas id="sim"></canvas></div>
-<script>
-async function start(){
-  for(let i=1;i<=4;i++){let r=await fetch('part'+i+'.txt');window['p'+i]=await r.text();}
-  let s=document.createElement('script');s.src='engine.js';document.body.appendChild(s);
-}start();
-</script></body></html>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Ультимативный Полигон Свифтса 2026</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            width: 100vw; height: 100vh; background: #05050a;
+            font-family: monospace; color: #00ff66; overflow: hidden;
+            display: flex; align-items: center; justify-content: center; user-select: none;
+        }
+        #box {
+            background: #111528; border: 2px solid #00ff66; padding: 30px;
+            border-radius: 10px; box-shadow: 0 0 25px #00ff66; text-align: center;
+            max-width: 650px; width: 90%; display: block;
+        }
+        .btn-ui {
+            display: inline-block; background: #00ff66; color: #000; border: none;
+            padding: 15px 30px; font-weight: bold; font-size: 16px; cursor: pointer;
+            border-radius: 6px; box-shadow: 0 0 15px #00ff66; margin: 15px 0;
+            text-decoration: none; transition: 0.2s; text-align: center;
+        }
+        .btn-ui:hover { background: #fff; box-shadow: 0 0 25px #fff; }
+        #polygon-screen {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #06060c; display: none; z-index: 5;
+        }
+        #sidebar {
+            position: absolute; top: 0; left: 0; width: 260px; height: 100vh;
+            background: #111322; border-right: 2px solid #aa00ff; padding: 20px;
+            display: flex; flex-direction: column; gap: 15px; z-index: 10;
+        }
+        .btn-poly {
+            background: #1a1d36; color: #aa00ff; border: 1px solid #aa00ff;
+            padding: 10px; font-family: monospace; font-weight: bold;
+            cursor: pointer; border-radius: 4px; transition: 0.2s; text-align: center;
+            width: 100%;
+        }
+        .btn-poly:hover { background: #aa00ff; color: #fff; box-shadow: 0 0 10px #aa00ff; }
+        #chat-box {
+            flex: 1; background: #0b0d18; border: 1px solid #333;
+            border-radius: 4px; display: flex; flex-direction: column; overflow: hidden;
+        }
+        #chat-log { flex: 1; padding: 8px; font-size: 11px; overflow-y: auto; color: #ff5555; text-align: left; }
+        #sim { width: 100%; height: 100%; display: block; }
+    </style>
+</head>
+<body>
 
+<div id="box">
+    <h2 style="text-shadow: 0 0 10px #00ff66; margin-bottom: 10px;">🎮 УЛЬТИМАТИВНЫЙ ПОЛИГОН 2026</h2>
+    <p style="color: #aaa; font-size: 12px;">Забери ИИ-игрока на любой сайт или открой секретный полигон!</p>
+    
+    <a id="drag-btn" class="btn-ui" href="#">🚀 КИБЕР-ОТРЯД: СТИКМЕН В ЗАКЛАДКУ</a>
+    <br>
+    <button class="btn-ui" id="go-poly" style="background:#aa00ff; color:#fff; box-shadow: 0 0 15px #aa00ff;">🤸‍♂️ ОТКРЫТЬ ФИЗИЧЕСКИЙ ПОЛИГОН</button>
+</div>
+
+<div id="polygon-screen">
+    <div id="sidebar">
+        <h3 style="color:#aa00ff;">⚙️ ПОЛИГОН СВИФТСА</h3>
+        <button class="btn-poly" id="btn-vac">🧹 ВКЛЮЧИТЬ ПЫЛЕСОС</button>
+        <button class="btn-poly" id="btn-gun">🔫 ОТКРЫТЬ ОГОНЬ</button>
+        <div id="chat-box"><div id="chat-log"></div></div>
+        <button class="btn-poly" id="exit-poly" style="background:#331111; color:red; border-color:red;">⬅️ Выход</button>
+    </div>
+    <canvas id="sim"></canvas>
+</div>
+
+<script>
+// КУСОК 1: Интерфейс, ИИ-Чат, Сканер и Мышка для ИИ-закладки на сайтах
+const part1 = "(function(){let s=document.createElement('style');s.innerHTML='#max-box{position:fixed;top:10px;right:10px;background:rgba(0,0,0,0.95);border:2px solid #aa00ff;padding:12px;z-index:2000005;font-family:monospace;width:240px;}#ghost-chat{position:fixed;bottom:20px;right:20px;width:300px;height:200px;background:rgba(0,0,0,0.9);border:2px solid #aa00ff;z-index:2000000;display:flex;flex-direction:column;font-family:monospace;}#chat-log{flex:1;overflow-y:auto;padding:6px;color:#ff3333;font-size:11px;}#ka-canvas{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:999996;pointer-events:none;}';document.head.appendChild(s);let cv=document.createElement('canvas');cv.id='ka-canvas';cv.width=window.innerWidth;cv.height=window.innerHeight;document.body.appendChild(cv);let ctx=cv.getContext('2d');let logBox=document.createElement('div');logBox.id='ghost-chat';logBox.innerHTML='<div id=\"chat-log\"><b>Геймер:</b> Ааа! Я застрял в коде сайта! Помоги!</div>';document.body.appendChild(logBox);let log=logBox.querySelector('#chat-log');let platforms=[];function scan(){platforms=[];document.querySelectorAll('p,span,a,h1,h2,li,button').forEach(el=>{if(el.id!=='ka-canvas'&&!el.closest('#ghost-chat')&&el.offsetWidth>15){let r=el.getBoundingClientRect();platforms.push({left:r.left,right:r.right,top:r.top});}});}scan();setInterval(scan,3000);let mx=0,my=0,isDragging=false,draggedPoint=null;window.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;},true);window.addEventListener('mousedown',e=>{let d=Math.sqrt((mx-p.head.x)**2+(my-p.head.y)**2);if(d<25){isDragging=true;draggedPoint=p.head;if(Math.random()>0.5){let pr=['Отпусти голову!','Ааа, VR костюм забаговался!','Хватит меня дёргать!'];let md=document.createElement('div');md.innerHTML='<b>Геймер:</b> '+pr[Math.floor(Math.random()*pr.length)];log.appendChild(md);log.scrollTop=log.scrollHeight;}}},true);window.addEventListener('mouseup',()=>{isDragging=false;draggedPoint=null;});let r={x:window.innerWidth/2,y:150,vx:0,vy:0,targetX:window.innerWidth/2};let p={head:{x:0,y:-32},chest:{x:0,y:-16},pelvis:{x:0,y:0},lHip:{x:-5,y:2},lKnee:{x:-8,y:16},lFoot:{x:-6,y:32},rHip:{x:5,y:2},rKnee:{x:8,y:16},rFoot:{x:6,y:32},lShld:{x:-8,y:-16},lElbow:{x:-16,y:-8},lHand:{x:-22,y:0},rShld:{x:8,y:-16},rElbow:{x:16,y:-8},rHand:{x:22,y:0}};let walkCycle=0;function solveIK(bx,by,tx,ty,l1,l2,f){let dx=tx-bx,dy=ty-by,d=Math.sqrt(dx*dx+dy*dy);if(d>l1+l2){let a=Math.atan2(dy,dx);return{x:bx+Math.cos(a)*l1,y:by+Math.sin(a)*l1};}let a=l1,b=l2,c=d;let cos1=(a*a+c*c-b*b)/(2*a*c);if(isNaN(cos1))cos1=1;let ang=Math.atan2(dy,dx)+(f?Math.acos(cos1):-Math.acos(cos1));return{x:bx+Math.cos(ang)*l1,y:by+Math.sin(ang)*l1};}function findGround(sx,cy){let b=window.innerHeight;for(let p of platforms){if(sx>=p.left&&sx<=p.right&&p.top>=cy-15&&p.top<b)b=p.top;}return b;}";
+// КУСОК 2: Симуляция ходьбы ногами по тексту и отрисовка Стикмэна на Canvas сайта
+const part2 = "let aiTimer=0,aiDir=1;function update(){if(isDragging){r.x+=(mx-r.x)*0.2;r.y+=(my+20-r.y)*0.2;r.vx=0;r.vy=0;}else{aiTimer--;if(aiTimer<=0){aiTimer=100+Math.random()*120;aiDir=Math.random()>0.5?1:-1;if(Math.random()>0.7)aiDir=0;}if(aiDir!==0){r.targetX+=aiDir*1.5;walkCycle+=0.1;}r.vx=(r.targetX-r.x)*0.08;r.x+=r.vx;let gY=findGround(r.x,r.y);r.y+=(gY-34-r.y)*0.12;}let inertia=r.vx*0.6;p.pelvis.x=r.x;p.pelvis.y=r.y;p.chest.x=r.x+inertia;p.chest.y=r.y-15;p.head.x=r.x+inertia*1.3;p.head.y=r.y-32;p.lHip.x=r.x-4;p.lHip.y=r.y+2;p.rHip.x=r.x+4;p.rHip.y=r.y+2;let lIdealX=r.x-8+Math.sin(walkCycle)*12;let lIdealY=findGround(lIdealX,r.y);p.lKnee=solveIK(p.lHip.x,p.lHip.y,lIdealX,lIdealY,15,15,false);p.lFoot={x:lIdealX,y:lIdealY};let rIdealX=r.x+8-Math.sin(walkCycle)*12;let rIdealY=findGround(rIdealX,r.y);p.rKnee=solveIK(p.rHip.x,p.rHip.y,rIdealX,rIdealY,15,15,true);p.rFoot={x:rIdealX,y:rIdealY};p.lShld.x=p.chest.x-5;p.lShld.y=p.chest.y-3;p.rShld.x=p.chest.x+5;p.rShld.y=p.chest.y-3;p.lElbow=solveIK(p.lShld.x,p.lShld.y,r.x-14,r.y-5,10,10,true);p.lHand={x:r.x-14,y:r.y-5};p.rElbow=solveIK(p.rShld.x,p.rShld.y,r.x+14,r.y-5,10,10,false);p.rHand={x:r.x+14,y:r.y-5};ctx.clearRect(0,0,cv.width,cv.height);ctx.strokeStyle='#000000';ctx.fillStyle='#000000';ctx.lineWidth=5;ctx.lineCap='round';ctx.lineJoin='round';ctx.beginPath();ctx.arc(p.head.x,p.head.y,5.5,0,Math.PI*2);ctx.fill();function dB(p1,p2){ctx.beginPath();ctx.moveTo(p1.x,p1.y);ctx.lineTo(p2.x,p2.y);ctx.stroke();}dB(p.head,p.chest);dB(p.chest,p.pelvis);dB(p.chest,p.lShld);dB(p.lShld,p.lElbow);dB(p.lElbow,p.lHand);dB(p.chest,p.rShld);dB(p.rShld,p.rElbow);dB(p.rElbow,p.rHand);dB(p.pelvis,p.lHip);dB(p.lHip,p.lKnee);dB(p.lKnee,p.lFoot);dB(p.pelvis,p.rHip);dB(p.rHip,p.rKnee);dB(p.rKnee,p.rFoot);requestAnimationFrame(update);}update();})();";document.getElementById("drag-btn").href="javascript:"+encodeURIComponent(part1+part2);";
+// КУСОК 3: Логика физического симулятора встроенного полигона (Коробка, пушки, засасывание)
+const polyCanvas = document.getElementById('sim');const pCtx = polyCanvas.getContext('2d');let polyActive = false, points = [], sticks = [], polyMx = 0, polyMy = 0, polyDragged = null, vacOn = false, gunOn = false, polyBullets = [], frameCount = 0;const pFloorY = () => polyCanvas.height - 40;const pWLeft = 40;const pWRight = () => polyCanvas.width - 40;document.getElementById('go-poly').onclick = () => { document.getElementById('box').style.display = 'none'; document.getElementById('polygon-screen').style.display = 'block'; polyCanvas.width = polyCanvas.parentNode.offsetWidth; polyCanvas.height = polyCanvas.parentNode.offsetHeight; polyActive = true; initPolyPhysics(); pSay("Ааа, что это за ящик?! Выпусти с компа!");};document.getElementById('exit-poly').onclick = () => { polyActive = false; document.getElementById('polygon-screen').style.display = 'none'; document.getElementById('box').style.display = 'block';};let pLog = document.getElementById('chat-log');function pSay(t){let d = document.createElement('div');d.innerHTML = '<b>Геймер:</b> ' + t;pLog.appendChild(d);pLog.scrollTop = pLog.scrollHeight;}function initPolyPhysics(){points = [];sticks = [];function addP(x,y){let p={x:x,y:y,oldX:x,oldY:y};points.push(p);return p;}function addS(p1,p2,l){let s={p1:p1,p2:p2,len:l};sticks.push(s);return s;}let h=addP(300,200),c=addP(300,220),pv=addP(300,240),lh=addP(292,242),lk=addP(290,265),lf=addP(290,290),rh=addP(308,242),rk=addP(310,265),rf=addP(310,290),ls=addP(288,218),lhn=addP(270,230),rs=addP(312,218),rhn=addP(330,230);addS(h,c,20);addS(c,pv,20);addS(c,ls,12);addS(ls,lhn,22);addS(c,rs,12);addS(rs,rhn,22);addS(pv,lh,8);addS(lh,lk,22);addS(lk,lf,22);addS(pv,rh,8);addS(rh,rk,22);addS(rk,rf,22);window.pH=h;window.pPV=pv;window.pLF=lf;window.pRF=rf;window.pC=c;window.pLS=ls;window.pLH=lhn;window.pRS=rs;window.pRH=rhn;}polyCanvas.addEventListener('mousemove',e=>{let r=polyCanvas.getBoundingClientRect();polyMx=e.clientX-r.left;polyMy=e.clientY-r.top;});polyCanvas.addEventListener('mousedown',() => {let best=25;points.forEach(p=>{let d=Math.sqrt((p.x-polyMx)**2+(p.y-polyMy)**2);if(d<best){best=d;polyDragged=p;}});if(polyDragged&&Math.random()>0.5)pSay("Хватит меня швырять! Я превращаюсь в рэгдолл-тряпку!");});window.addEventListener('mouseup',()=>{polyDragged=null;});document.getElementById('btn-vac').onclick=()=>{vacOn=!vacOn;document.getElementById('btn-vac').style.background=vacOn?'#ff0055':'#1a1d36';if(vacOn)pSay("О нет! Это воронка Electrolux! Помогите, меня засасывает!");};document.getElementById('btn-gun').onclick=()=>{gunOn=!gunOn;document.getElementById('btn-gun').style.background=gunOn?'#ff0055':'#1a1d36';};let pWalk=0,pAiDir=1,pAiTimer=0,pPhrases=["Мой VR костюм трещит по швам!","Отпусти меня из этой песочницы!","Ай! Пуля попала по трекеру!","Тут гравитация реальная!","Выключи пушки!","Слышь, админ, вытащи меня с компа!"];function runPolyPhysics(){frameCount++;if(!polyDragged&&!vacOn){pAiTimer--;if(pAiTimer<=0){pAiTimer=100+Math.random()*100;pAiDir=Math.random()>0.5?1:-1;}pWalk+=0.12;window.pPelvis.x+=pAiDir*0.8;if(Math.sin(pWalk)>0){window.pLeftFoot.x+=(window.pPelvis.x-14+Math.sin(pWalk)*8-window.pLeftFoot.x)*0.2;window.pLeftFoot.y+=(pFloorY()-window.pLeftFoot.y)*0.2;window.pRightFoot.y+=(pFloorY()-8-window.pRightFoot.y)*0.2;}else{window.pRightFoot.x+=(window.pPelvis.x+14-Math.sin(pWalk)*8-window.pRightFoot.x)*0.2;window.pRightFoot.y+=(pFloorY()-window.pRightFoot.y)*0.2;window.pLeftFoot.y+=(pFloorY()-8-window.pLeftFoot.y)*0.2;}}else if(polyDragged){polyDragged.x=polyMx;polyDragged.y=polyMy;polyDragged.oldX=polyMx;polyDragged.oldY=polyMy;}if(vacOn){points.forEach(p=>{let dx=80-p.x,dy=100-p.y,dist=Math.sqrt(dx*dx+dy*dy);if(dist>10){p.x+=(dx/dist)*3.5;p.y+=(dy/dist)*3.5;}});}if(gunOn&&frameCount%15===0)polyBullets.push({x:pWRight()-10,y:window.pH.y+(Math.random()*60-30),vx:-10});polyBullets.forEach((b,idx)=>{b.x+=b.vx;points.forEach(p=>{if(Math.sqrt((p.x-b.x)**2+(p.y-b.y)**2)<18){p.x+=b.vx*0.8;polyBullets.splice(idx,1);if(Math.random()>0.8)pSay("Ай! Пуля попала!");}});if(b.x<pWLeft)polyBullets.splice(idx,1);});points.forEach(p=>{if(p===polyDragged)return;let vx=(p.x-p.oldX)*0.98,vy=(p.y-p.oldY)*0.98;p.oldX=p.x;p.oldY=p.y;p.x+=vx;p.y+=vy+0.35;});for(let i=0;i<5;i++){sticks.forEach(s=>{let dx=s.p2.x-s.p1.x,dy=s.p2.y-s.p1.y,dist=Math.sqrt(dx*dx+dy*dy);let diff=s.len-dist,percent=(diff/dist)*0.5;if(s.p1!==polyDragged){s.p1.x-=dx*percent;s.p1.y-=dy*percent;}if(s.p2!==polyDragged){s.p2.x+=dx*percent;s.p2.y+=dy*percent;}});}points.forEach(p=>{if(p.y>pFloorY()){p.y=pFloorY();p.oldY=p.y+(p.y-p.oldY)*0.2;}if(p.x<pWLeft){p.x=pWLeft;p.oldX=p.x;}if(p.x>pWRight()){p.x=pWRight();p.oldX=p.x;}});}function renderPolyLoop(){if(!polyActive)return;runPolyPhysics();pCtx.clearRect(0,0,polyCanvas.width,polyCanvas.height);pCtx.strokeStyle='#333';pCtx.lineWidth=4;pCtx.beginPath();pCtx.moveTo(pWLeft,50);pCtx.lineTo(pWLeft,pFloorY());pCtx.lineTo(pWRight(),pFloorY());pCtx.lineTo(pWRight(),50);pCtx.stroke();if(vacOn){pCtx.fillStyle='#ff0055';pCtx.beginPath();pCtx.arc(80,100,25,0,Math.PI*2);pCtx.fill();pCtx.strokeStyle='#ff0055';pCtx.lineWidth=2;pCtx.beginPath();pCtx.arc(80,100,60+Math.sin(frameCount*0.2)*15,0,Math.PI*2);pCtx.stroke();}pCtx.fillStyle='#ffff00';polyBullets.forEach(b=>{pCtx.fillRect(b.x,b.y,8,3);});pCtx.strokeStyle='#000000';pCtx.fillStyle='#000000';pCtx.lineWidth=5.5;pCtx.lineCap='round';pCtx.lineJoin='round';pCtx.beginPath();pCtx.arc(window.pH.x,window.pH.y,6.5,0,Math.PI*2);getP=pCtx.fill();function dL(p1,p2){pCtx.beginPath();pCtx.moveTo(p1.x,p1.y);pCtx.lineTo(p2.x,p2.y);pCtx.stroke();}dL(window.pH,window.pC);dL(window.pC,window.pPV);dL(window.pC,window.pLF);dL(window.pC,window.pRF);requestAnimationFrame(renderPolyLoop);}setInterval(()=>{if(polyActive&&!polyDragged&&!vacOn&&Math.random()>0.85)pSay(pPhrases[Math.floor(Math.random()*pPhrases.length)]);},8000);setInterval(()=>{if(polyActive)renderPolyLoop();},16);
+</script>
+</body>
+</html>

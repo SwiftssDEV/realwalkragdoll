@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Физический Рэгдолл-Стикмен Свифтса</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            width: 100vw; height: 100vh; background: #05050a;
+            font-family: monospace; color: #00ff66;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center; user-select: none;
+        }
+        #box {
+            background: #111528; border: 2px solid #00ff66; padding: 30px;
+            border-radius: 10px; box-shadow: 0 0 25px #00ff66; text-align: center;
+            max-width: 650px; width: 90%;
+        }
+        #drag-btn {
+            display: inline-block; background: #00ff66; color: #000; border: none;
+            padding: 15px 30px; font-weight: bold; font-size: 16px; cursor: move;
+            border-radius: 6px; box-shadow: 0 0 15px #00ff66; margin: 20px 0;
+            text-decoration: none; transition: 0.2s;
+        }
+        #drag-btn:hover { background: #fff; box-shadow: 0 0 25px #fff; }
+        ol { text-align: left; color: #faedcd; font-size: 13px; line-height: 1.6; margin-left: 20px; }
+    </style>
+</head>
+<body>
+
+<div id="box">
+    <h2 style="text-shadow: 0 0 10px #00ff66; margin-bottom: 10px;">🤸‍♂️ ФИЗИЧЕСКИЙ РЭГДОЛЛ-СТИКМЕН 2026</h2>
+    <p style="color: #aaa; font-size: 12px;">Честная процедурная ходьба ногами по тексту любого сайта!</p>
+    
+    <a id="drag-btn" href="#">🚀 ПЕРЕТАЩИ СТИКМЕНА НА ПАНЕЛЬ</a>
+    
+    <div style="text-align: left; margin-top: 15px;">
+        <h4 style="color: #fff; margin-bottom: 5px;">🕹️ КАК ИГРАТЬ НА САЙТАХ:</h4>
+        <ol>
+            <li>Убедись, что панель закладок включена (<b>Ctrl + Shift + B</b>).</li>
+            <li>Перетащи зелёную кнопку на панель закладок Оперы.</li>
+            <li>Открой любой текстовый сайт (например, Википедию или новости).</li>
+            <li>Жми на закладку: управляй на <b>A / D</b> (или стрелочки) — тело будет смещаться, а ноги честно переступать по строчкам текста!</li>
+        </ol>
+    </div>
+</div>
+
+<script>
+// ==========================================
+// ЧАСТЬ 1: Худ, Сканер блоков сайта и Инициализация 11-костного скелета ragdoll
+// ==========================================
+const part1 = "(function(){let style=document.createElement('style');style.innerHTML='#ka-canvas{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:999996;pointer-events:none;}#g-hud{position:fixed;top:20px;left:20px;background:#000;padding:12px;border:2px solid #00ff66;color:#00ff66;font-family:monospace;z-index:999999;pointer-events:auto;}';document.head.appendChild(style);let ui=document.createElement('div');ui.id='g-hud';ui.innerHTML='<b>🤸‍♂️ ЧЕСТНЫЙ РЭГДОЛЛ-СТИКМЕН</b><br><span style=\"color:#aaa;font-size:11px;\">Управление: [A]/[D] или Стрелочки</span>';document.body.appendChild(ui);let cv=document.createElement('canvas');cv.id='ka-canvas';cv.width=window.innerWidth;cv.height=window.innerHeight;document.body.appendChild(cv);let ctx=cv.getContext('2d');let platforms=[];function scan(){platforms=[];document.querySelectorAll('p,span,a,h1,h2,li,button').forEach(el=>{if(el.id!=='ka-canvas'&&!el.closest('#g-hud')&&el.offsetWidth>15){let r=el.getBoundingClientRect();platforms.push({left:r.left,right:r.right,top:r.top});}});}scan();window.addEventListener('resize',scan);setInterval(scan,3000);let keys={};window.addEventListener('keydown',e=>{if(['Space','ArrowUp','ArrowDown','KeyW','KeyS','ArrowLeft','ArrowRight','KeyA','KeyD'].includes(e.code))e.preventDefault();keys[e.code]=true;},true);window.addEventListener('keyup',e=>{keys[e.code]=false;},true);let r={x:window.innerWidth/2,y:150,vx:0,vy:0,targetX:window.innerWidth/2};let p={head:{x:0,y:-32},chest:{x:0,y:-16},pelvis:{x:0,y:0},lHip:{x:-5,y:2},lKnee:{x:-8,y:16},lFoot:{x:-6,y:32},rHip:{x:5,y:2},rKnee:{x:8,y:16},rFoot:{x:6,y:32},lShld:{x:-8,y:-16},lElbow:{x:-16,y:-8},lHand:{x:-22,y:0},rShld:{x:8,y:-16},rElbow:{x:16,y:-8},rHand:{x:22,y:0}};let walkCycle=0,activeFoot=0;let leftTargetFoot={x:r.x-12,y:r.y+35,grounded:true},rightTargetFoot={x:r.x+12,y:r.y+35,grounded:true};function solveIK(baseX,baseY,targetX,targetY,len1,len2,flip){let dx=targetX-baseX,dy=targetY-baseY,dist=Math.sqrt(dx*dx+dy*dy);if(dist>len1+len2){let ang=Math.atan2(dy,dx);return{x:baseX+Math.cos(ang)*len1,ang1:ang,ang2:0};}let a=len1,b=len2,c=dist;let cosAng1=(a*a+c*c-b*b)/(2*a*c);if(isNaN(cosAng1))cosAng1=1;let ang1=Math.atan2(dy,dx)+(flip?Math.acos(cosAng1):-Math.acos(cosAng1));let kx=baseX+Math.cos(ang1)*len1;let ang2=Math.atan2(targetY-kx,targetX-kx);return{x:kx,y:baseY+Math.sin(ang1)*len1};}";
+
+// ==========================================
+// ЧАСТЬ 2: Физика процедурного шага по тексту и Отрисовка 11 суставов на Canvas
+// ==========================================
+const part2 = "function findGround(searchX,currentY){let bestTop=window.innerHeight;for(let p of platforms){if(searchX>=p.left&&searchX<=p.right){if(p.top>=currentY-10&&p.top<bestTop){bestTop=p.top;}}}return bestTop;}function updateRagdoll(){if(keys['KeyA']||keys['ArrowLeft']){r.targetX-=3.5;walkCycle+=0.15;}if(keys['KeyD']||keys['ArrowRight']){r.targetX+=3.5;walkCycle+=0.15;}r.vx=(r.targetX-r.x)*0.1;r.x+=r.vx;let groundY=findGround(r.x,r.y);let desiredBodyHeight=groundY-38;r.y+=(desiredBodyHeight-r.y)*0.15;let lIdealX=r.x-10+Math.sin(walkCycle)*14;let rIdealX=r.x+10-Math.sin(walkCycle)*14;let lIdealY=findGround(lIdealX,r.y);let rIdealY=findGround(rIdealX,r.y);if(Math.sin(walkCycle)>0){if(activeFoot!==1){activeFoot=1;}leftTargetFoot.x+=(lIdealX-leftTargetFoot.x)*0.3;leftTargetFoot.y+=(lIdealY-6-leftTargetFoot.y)*0.3;rightTargetFoot.y+=(rIdealY-rightTargetFoot.y)*0.4;}else{if(activeFoot!==2){activeFoot=2;}rightTargetFoot.x+=(rIdealX-rightTargetFoot.x)*0.3;rightTargetFoot.y+=(rIdealY-6-rightTargetFoot.y)*0.3;leftTargetFoot.y+=(lIdealY-leftTargetFoot.y)*0.4;}let spineOffset=r.vx*0.8;p.pelvis.x=r.x;p.pelvis.y=r.y;p.chest.x=r.x+spineOffset;p.chest.y=r.y-16;p.head.x=r.x+spineOffset*1.4;p.head.y=r.y-34;p.lHip.x=r.x-5;p.lHip.y=r.y+3;p.rHip.x=r.x+5;p.rHip.y=r.y+3;let lKneePos=solveIK(p.lHip.x,p.lHip.y,leftTargetFoot.x,leftTargetFoot.y,16,16,false);p.lKnee=lKneePos;p.lFoot=leftTargetFoot;let rKneePos=solveIK(p.rHip.x,p.rHip.y,rightTargetFoot.x,rightTargetFoot.y,16,16,true);p.rKnee=rKneePos;p.rFoot=rightTargetFoot;p.lShld.x=p.chest.x-6;p.lShld.y=p.chest.y-4;p.rShld.x=p.chest.x+6;p.rShld.y=p.chest.y-4;let lHandT={x:r.x-15-Math.sin(walkCycle)*10,y:r.y-5};let rHandT={x:r.x+15+Math.sin(walkCycle)*10,y:r.y-5};let lElbPos=solveIK(p.lShld.x,p.lShld.y,lHandT.x,lHandT.y,12,12,true);p.lElbow=lElbPos;p.lHand=lHandT;let rElbPos=solveIK(p.rShld.x,p.rShld.y,rHandT.x,rHandT.y,12,12,false);p.rKnee=rKneePos;p.rFoot=rightTargetFoot;p.rElbow=rElbPos;p.rHand=rHandT;}function drawBone(p1,p2){ctx.beginPath();ctx.moveTo(p1.x,p1.y);ctx.lineTo(p2.x,p2.y);ctx.stroke();}function render(){ctx.clearRect(0,0,cv.width,cv.height);updateRagdoll();ctx.strokeStyle='#00ff66';ctx.fillStyle='#00ff66';ctx.lineWidth=4;ctx.lineCap='round';ctx.lineJoin='round';ctx.beginPath();ctx.arc(p.head.x,p.head.y,6,0,Math.PI*2);ctx.fill();drawBone(p.head,p.chest);drawBone(p.chest,p.pelvis);drawBone(p.chest,p.lShld);drawBone(p.lShld,p.lElbow);drawBone(p.lElbow,p.lHand);drawBone(p.chest,p.rShld);drawBone(p.rShld,p.rElbow);drawBone(p.rElbow,p.rHand);drawBone(p.pelvis,p.lHip);drawBone(p.lHip,p.lKnee);drawBone(p.lKnee,p.lFoot);drawBone(p.pelvis,p.rHip);drawBone(p.rHip,p.rKnee);drawBone(p.rKnee,p.rFoot);ctx.fillStyle='#ff0055';platforms.forEach(p=>{ctx.globalAlpha=0.15;ctx.fillStyle='#00ff66';ctx.fillRect(p.left,p.top,p.right-p.left,3);ctx.globalAlpha=1.0;});requestAnimationFrame(render);}render();})();";
+
+// Собираем две части кода воедино
+const gameCode = part1 + part2;
+
+// Прописываем сгенерированную готовую ссылку-закладку на зелёную кнопку
+document.getElementById("drag-btn").href = "javascript:" + encodeURIComponent(gameCode);
+</script>
+
+</body>
+</html>
